@@ -20,6 +20,8 @@ int step = 0;
 int level = 0;
 int inputNumber = 0;
 
+bool lost = false;
+
 // # ---------------------| FUNCTION |--------------------- #
 // move joystick function -> return an integer
 int moveJoystick() {
@@ -111,6 +113,7 @@ void loop() {
           digitalWrite(combinationPlayed[level], HIGH);
           delay(400);
           digitalWrite(combinationPlayed[level], LOW);
+          delay(100);
 
           inputNumber++;
 
@@ -121,6 +124,7 @@ void loop() {
           }
         }
       }
+      delay(100);
       break;
 
     case 3:
@@ -132,10 +136,15 @@ void loop() {
       for (int i = 0; i <= level; i++) {
         // Compares the random LED combination with the combination played
         if (levelCombination[i] != combinationPlayed[i]) {
-          step = 4;
-        } else {
-          step = 5;
+          lost = true;
+          break;
         }
+      }
+
+      if (lost == true) {
+        step = 4;
+      } else {
+        step = 5;
       }
       break;
 
@@ -153,6 +162,7 @@ void loop() {
       // Reset step and level
       level = 0;
       step = 0;
+      lost = false;
       delay(1000);
       break;
 
