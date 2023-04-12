@@ -1,12 +1,14 @@
 #include <LiquidCrystal.h>
 
+// # -------------------| GLOBAL VAR |------------------- #
 #define BUZZER 3
 #define JOYSTICK_X A0
 #define JOYSTICK_Y A1
 
 LiquidCrystal LCD(13, 12, 4, 5, 6, 7);
 
-const int LED[4] = { 11, 10, 9, 8 };
+const int NUMBER_OF_LED = 4;
+const int LED[NUMBER_OF_LED] = { 11, 10, 9, 8 };
 const int LCD_NB_ROWS = 2;
 const int LCD_NB_COLUMNS = 16;
 const int FREQUENCY = 255;
@@ -18,6 +20,8 @@ int step = 0;
 int level = 0;
 int inputNumber = 0;
 
+// # ---------------------| FUNCTION |--------------------- #
+// move joystick function -> return an integer
 int moveJoystick() {
   xValue = analogRead(JOYSTICK_X);
   yValue = analogRead(JOYSTICK_Y);
@@ -43,10 +47,13 @@ int moveJoystick() {
   return 0;
 }
 
+// # ------------------| SETUP AND LOOP |------------------ #
 void setup() {
+  // LCD initialization
   LCD.begin(LCD_NB_COLUMNS, LCD_NB_ROWS);
 
-  for (int i = 0; i < 4; i++) {
+  // LED initialization
+  for (int i = 0; i < NUMBER_OF_LED; i++) {
     // LED[0] GREEN 11
     // LED[1] BLUE 10
     // LED[2] RED 9
@@ -58,7 +65,7 @@ void setup() {
 
 void loop() {
   int randomLed = random(8, 12);
-  
+
   switch (step) {
     case 0:
       LCD.setCursor(0, 0);
@@ -77,10 +84,12 @@ void loop() {
       LCD.print("Level: ");
       LCD.setCursor(7, 0);
       LCD.print(level);
+      // Space needed to write over the old screen in position (0, 1)
       LCD.setCursor(0, 1);
       LCD.print("  * Memorise *  ");
       delay(500);
 
+      // Generates a random combination of LEDs based on level
       levelCombination[level] = randomLed;
       for (int i = 0; i <= level; i++) {
         digitalWrite(levelCombination[i], HIGH);
@@ -92,10 +101,11 @@ void loop() {
       break;
 
     case 2:
+      // Space needed to write over the old screen in position (0, 1)
       LCD.setCursor(0, 1);
       LCD.print("    * Play *    ");
 
-      for (int i = 0; i < 4; i++) {
+      for (int i = 0; i < NUMBER_OF_LED; i++) {
         if (moveJoystick() != 0) {
           combinationPlayed[level] = moveJoystick();
           digitalWrite(combinationPlayed[level], HIGH);
@@ -114,11 +124,13 @@ void loop() {
       break;
 
     case 3:
+      // Space needed to write over the old screen in position (0, 1)
       LCD.setCursor(0, 1);
       LCD.print("* Verification *");
       delay(1000);
 
       for (int i = 0; i <= level; i++) {
+        // Compares the random LED combination with the combination played
         if (levelCombination[i] != combinationPlayed[i]) {
           step = 4;
         } else {
@@ -128,21 +140,28 @@ void loop() {
       break;
 
     case 4:
+      // Space needed to write over the old screen in position (0, 1)
       LCD.setCursor(0, 1);
       LCD.print("   *  LOST  *   ");
 
+      // Sound ON
       tone(BUZZER, FREQUENCY);
       delay(500);
+      // Sound OFF
       noTone(BUZZER);
 
+      // Reset step and level
       level = 0;
       step = 0;
       delay(1000);
       break;
 
     case 5:
+      // Space needed to write over the old screen in position (0, 1)
       LCD.setCursor(0, 1);
       LCD.print("    *  WIN  *    ");
+
+      // Increase step and level
       level++;
       step = 1;
       delay(1000);
